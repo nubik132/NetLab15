@@ -8,13 +8,14 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-struct Employee
+struct Student
 {
     char name[35];
-    char lastname[10];
+    char lastname[35];
     char birthday[10];
     char number[4];
-} students[5];
+} students[100];
+int studentsLength;
 // процедура для обслуживания соединения
 int Func(int newS)
 {
@@ -30,26 +31,78 @@ int Func(int newS)
         switch (p)
         {
         case '1':
-            buf[0] = '\0';
-            sum = 0;
+        {
+            // Поиск
+
             recv(newS, buf, sizeof(buf), 0);
-            mon = atoi(buf);
-            recv(newS, buf, sizeof(buf), 0);
-            s = buf[0];
-            for (i = 1; i <= 5; i++)
-                if (students[i].name[0] == s)
+            char property = buf[0];
+            bool foundedStudentsMarks[100];
+            int foundedStudentsLength = 0;
+            switch (buf[0])
+            {
+            case 1:
+                recv(newS, buf, sizeof(buf), 0);
+                for (int i = 0; i < studentsLength; i++)
                 {
-                    nal = atoi(students[i].number);
-                    doh = atoi(students[i].birthday);
-                    printf("mon %d\n", mon);
-                    sum = sum + (nal * doh * mon) / 100.0;
+                    foundedStudentsMarks[i] = strcmp(students[i].name, buf) != NULL ? 1 : 0;
                 }
-            int *decpt, *sgn;
-            printf("%f\n", sum);
-            sprintf(buf, "%.3f", sum);
-            send(newS, buf, sizeof(buf), 0);
-            puts(buf);
+                break;
+            case 2:
+                recv(newS, buf, sizeof(buf), 0);
+                for (int i = 0; i < studentsLength; i++)
+                {
+                    foundedStudentsMarks[i] = strcmp(students[i].lastname, buf) != NULL ? 1 : 0;
+                }
+                break;
+            case 3:
+                recv(newS, buf, sizeof(buf), 0);
+                for (int i = 0; i < studentsLength; i++)
+                {
+                    foundedStudentsMarks[i] = strcmp(students[i].birthday, buf) != NULL ? 1 : 0;
+                }
+                break;
+            case 4:
+                recv(newS, buf, sizeof(buf), 0);
+                for (int i = 0; i < studentsLength; i++)
+                {
+                    foundedStudentsMarks[i] = strcmp(students[i].number, buf) != NULL ? 1 : 0;
+                }
+                break;
+
+            default:
+                break;
+            }
+            struct Student foundedStudents[100];
+            for (int i = 0; i < 100; i++)
+            {
+                if (foundedStudentsMarks[i])
+                {
+                    foundedStudents[foundedStudentsLength++] = students[i];
+                }
+            }
+            send(newS, (char *)&foundedStudentsLength, sizeof(int), 0);
+            send(newS, foundedStudents, sizeof(foundedStudents), 0);
+            // buf[0] = '\0';
+            // sum = 0;
+            // recv(newS, buf, sizeof(buf), 0);
+            // mon = atoi(buf);
+            // recv(newS, buf, sizeof(buf), 0);
+            // s = buf[0];
+            // for (i = 1; i <= 5; i++)
+            //     if (students[i].name[0] == s)
+            //     {
+            //         nal = atoi(students[i].number);
+            //         doh = atoi(students[i].birthday);
+            //         printf("mon %d\n", mon);
+            //         sum = sum + (nal * doh * mon) / 100.0;
+            //     }
+            // int *decpt, *sgn;
+            // printf("%f\n", sum);
+            // sprintf(buf, "%.3f", sum);
+            // send(newS, buf, sizeof(buf), 0);
+            // puts(buf);
             break;
+        }
         case '2':
             recv(newS, buf, sizeof(buf), 0); // Номер
             num = atoi(buf);
@@ -104,26 +157,27 @@ void reaper(int sig)
 }
 int main()
 {
-    strcpy(students[0].name, "Sergeev Sergei Sergeevich");
-    strcpy(students[0].lastname, "1");
-    strcpy(students[0].birthday, "100000");
-    strcpy(students[0].number, "10");
-    strcpy(students[1].name, "Ivanov Ivan Ivanovich");
-    strcpy(students[1].lastname, "2");
-    strcpy(students[1].birthday, "200000");
-    strcpy(students[1].number, "20");
-    strcpy(students[2].name, "Vladimirov Vladimir Vladimirovich");
-    strcpy(students[2].lastname, "3");
-    strcpy(students[2].birthday, "300000");
-    strcpy(students[2].number, "30");
-    strcpy(students[3].name, "Sidorov Sidor Sidorovich ");
-    strcpy(students[3].lastname, "4");
-    strcpy(students[3].birthday, "400000");
-    strcpy(students[3].number, "40");
-    strcpy(students[4].name, "Vasilev Vasilii Vasilievich");
-    strcpy(students[4].lastname, "5");
-    strcpy(students[4].birthday, "500000");
-    strcpy(students[4].number, "50");
+    strcpy(students[0].name, "Sergei");
+    strcpy(students[0].lastname, "Sergeev");
+    strcpy(students[0].birthday, "25/05/2005");
+    strcpy(students[0].number, "67745");
+    strcpy(students[1].name, "Ivan");
+    strcpy(students[1].lastname, "Ivanov");
+    strcpy(students[1].birthday, "17/02/2004");
+    strcpy(students[1].number, "67256");
+    strcpy(students[2].name, "Vladimir");
+    strcpy(students[2].lastname, "Vladimirov");
+    strcpy(students[2].birthday, "12/09/2003");
+    strcpy(students[2].number, "67865");
+    strcpy(students[3].name, "Sidor");
+    strcpy(students[3].lastname, "Sidorov");
+    strcpy(students[3].birthday, "02/12/2002");
+    strcpy(students[3].number, "67123");
+    strcpy(students[4].name, "Vasilii");
+    strcpy(students[4].lastname, "Vasilev");
+    strcpy(students[4].birthday, "25/05/2001");
+    strcpy(students[4].number, "67532");
+    studentsLength = 5;
     struct sockaddr_in local;
     int s,
         newS, rc;

@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-struct Employee
+struct Student
 {
     char name[35];
     char number[10];
