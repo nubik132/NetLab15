@@ -14,7 +14,7 @@ struct Student
     char lastname[35];
     char birthday[10];
     char number[4];
-} students[100];
+} students[100], foundedStudents[100];
 int studentsLength;
 // процедура для обслуживания соединения
 int Func(int newS)
@@ -27,6 +27,7 @@ int Func(int newS)
     while (true)
     {
         recv(newS, buf, sizeof(buf), 0);
+        puts(buf);
         p = buf[0];
         switch (p)
         {
@@ -35,44 +36,43 @@ int Func(int newS)
             // Поиск
 
             recv(newS, buf, sizeof(buf), 0);
+            puts(buf);
             char property = buf[0];
             bool foundedStudentsMarks[100];
             int foundedStudentsLength = 0;
-            switch (buf[0])
+            p = buf[0];
+            recv(newS, buf, sizeof(buf), 0);
+            puts(buf);
+            switch (p)
             {
-            case 1:
-                recv(newS, buf, sizeof(buf), 0);
+            case '1':
                 for (int i = 0; i < studentsLength; i++)
                 {
-                    foundedStudentsMarks[i] = strcmp(students[i].name, buf) != NULL ? 1 : 0;
+                    foundedStudentsMarks[i] = strcmp(students[i].name, buf) == 0 ? 1 : 0;
                 }
                 break;
-            case 2:
-                recv(newS, buf, sizeof(buf), 0);
+            case '2':
                 for (int i = 0; i < studentsLength; i++)
                 {
-                    foundedStudentsMarks[i] = strcmp(students[i].lastname, buf) != NULL ? 1 : 0;
+                    foundedStudentsMarks[i] = strcmp(students[i].lastname, buf) == 0 ? 1 : 0;
                 }
                 break;
-            case 3:
-                recv(newS, buf, sizeof(buf), 0);
+            case '3':
                 for (int i = 0; i < studentsLength; i++)
                 {
-                    foundedStudentsMarks[i] = strcmp(students[i].birthday, buf) != NULL ? 1 : 0;
+                    foundedStudentsMarks[i] = strcmp(students[i].birthday, buf) == 0 ? 1 : 0;
                 }
                 break;
-            case 4:
-                recv(newS, buf, sizeof(buf), 0);
+            case '4':
                 for (int i = 0; i < studentsLength; i++)
                 {
-                    foundedStudentsMarks[i] = strcmp(students[i].number, buf) != NULL ? 1 : 0;
+                    foundedStudentsMarks[i] = strcmp(students[i].number, buf) == 0 ? 1 : 0;
                 }
                 break;
 
             default:
                 break;
             }
-            struct Student foundedStudents[100];
             for (int i = 0; i < 100; i++)
             {
                 if (foundedStudentsMarks[i])
@@ -80,27 +80,10 @@ int Func(int newS)
                     foundedStudents[foundedStudentsLength++] = students[i];
                 }
             }
-            send(newS, (char *)&foundedStudentsLength, sizeof(int), 0);
-            send(newS, foundedStudents, sizeof(foundedStudents), 0);
-            // buf[0] = '\0';
-            // sum = 0;
-            // recv(newS, buf, sizeof(buf), 0);
-            // mon = atoi(buf);
-            // recv(newS, buf, sizeof(buf), 0);
-            // s = buf[0];
-            // for (i = 1; i <= 5; i++)
-            //     if (students[i].name[0] == s)
-            //     {
-            //         nal = atoi(students[i].number);
-            //         doh = atoi(students[i].birthday);
-            //         printf("mon %d\n", mon);
-            //         sum = sum + (nal * doh * mon) / 100.0;
-            //     }
-            // int *decpt, *sgn;
-            // printf("%f\n", sum);
-            // sprintf(buf, "%.3f", sum);
-            // send(newS, buf, sizeof(buf), 0);
-            // puts(buf);
+            puts("Строка 83");
+            send(newS, &foundedStudentsLength, sizeof(int), 0);
+            send(newS, foundedStudents, 100 * sizeof(struct Student), 0);
+
             break;
         }
         case '2':

@@ -47,20 +47,15 @@ int main()
             scanf("%s", buf);
             send(s, buf, sizeof(buf), 0);
 
-            recv(s, buf, sizeof(buf), 0);
-            int foundedStudentsLength = *(int *)buf;
-
-            recv(s, (char *)students, sizeof(students), 0);
+            int foundedStudentsLength = 0;
+            recv(s, &foundedStudentsLength, sizeof(int), 0);
+            recv(s, students, 100 * sizeof(struct Student), 0);
             for (int i = 0; i < foundedStudentsLength; i++)
             {
                 puts(students[i].name);
-                puts("\t");
                 puts(students[i].lastname);
-                puts("\t");
                 puts(students[i].birthday);
-                puts("\t");
                 puts(students[i].number);
-                puts("\t");
             }
 
             // puts("kol-vo months (1-12) :");
