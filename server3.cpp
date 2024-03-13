@@ -12,10 +12,10 @@ struct Student
 {
     char name[35];
     char lastname[35];
-    char birthday[10];
-    char number[4];
+    char birthday[12];
+    char number[6];
 } students[100], foundedStudents[100];
-int studentsLength;
+int studentsLength = 0;
 // процедура для обслуживания соединения
 int Func(int newS)
 {
@@ -40,32 +40,38 @@ int Func(int newS)
             char property = buf[0];
             bool foundedStudentsMarks[100];
             int foundedStudentsLength = 0;
-            p = buf[0];
             recv(newS, buf, sizeof(buf), 0);
-            puts(buf);
-            switch (p)
+            switch (property)
             {
+            case '1':
             case '1':
                 for (int i = 0; i < studentsLength; i++)
                 {
                     foundedStudentsMarks[i] = strcmp(students[i].name, buf) == 0 ? 1 : 0;
+                    foundedStudentsMarks[i] = strcmp(students[i].name, buf) == 0 ? 1 : 0;
                 }
                 break;
+            case '2':
             case '2':
                 for (int i = 0; i < studentsLength; i++)
                 {
                     foundedStudentsMarks[i] = strcmp(students[i].lastname, buf) == 0 ? 1 : 0;
+                    foundedStudentsMarks[i] = strcmp(students[i].lastname, buf) == 0 ? 1 : 0;
                 }
                 break;
+            case '3':
             case '3':
                 for (int i = 0; i < studentsLength; i++)
                 {
                     foundedStudentsMarks[i] = strcmp(students[i].birthday, buf) == 0 ? 1 : 0;
+                    foundedStudentsMarks[i] = strcmp(students[i].birthday, buf) == 0 ? 1 : 0;
                 }
                 break;
             case '4':
+            case '4':
                 for (int i = 0; i < studentsLength; i++)
                 {
+                    foundedStudentsMarks[i] = strcmp(students[i].number, buf) == 0 ? 1 : 0;
                     foundedStudentsMarks[i] = strcmp(students[i].number, buf) == 0 ? 1 : 0;
                 }
                 break;
@@ -75,56 +81,26 @@ int Func(int newS)
             }
             for (int i = 0; i < 100; i++)
             {
-                if (foundedStudentsMarks[i])
+                if (foundedStudentsMarks[i] == 1)
                 {
                     foundedStudents[foundedStudentsLength++] = students[i];
                 }
             }
-            puts("Строка 83");
             send(newS, &foundedStudentsLength, sizeof(int), 0);
-            send(newS, foundedStudents, 100 * sizeof(struct Student), 0);
-
+            send(newS, foundedStudents, sizeof(struct Student) * 100, 0);
             break;
         }
         case '2':
-            recv(newS, buf, sizeof(buf), 0); // Номер
-            num = atoi(buf);
-            printf("%d\n", num);
-            recv(newS, buf, sizeof(buf), 0);
-            p1 = buf[0];
-            switch (p1)
-            {
-            case '1':
-                recv(newS, buf, sizeof(buf), 0); // Имя
-                strcpy(students[num].name, buf);
-                break;
-            case '2':
-                recv(newS, buf, sizeof(buf), 0); // Таб.номер
-                strcpy(students[num].lastname, buf);
-                break;
-            case '3':
-                recv(newS, buf, sizeof(buf), 0); // Доход
-                strcpy(students[num].birthday, buf);
-                break;
-            case '4':
-                recv(newS, buf, sizeof(buf), 0); // Ставка налога
-                strcpy(students[num].number, buf);
-            }
+            struct Student student;
+            recv(newS, &student, sizeof(Student), 0);
+            students[studentsLength++] = student;
             break;
         case '3':
-            for (i = 1; i <= 5; i++)
-            {
-                buf[0] = '\0';
-                strcat(buf, students[i].name);
-                strcat(buf, " ");
-                strcat(buf, students[i].lastname);
-                strcat(buf, " ");
-                strcat(buf, students[i].birthday);
-                strcat(buf, " ");
-                strcat(buf, students[i].number);
-                strcat(buf, "\n");
-                send(newS, buf, sizeof(buf), 0);
-            }
+            strcpy(students[studentsLength - 1].name, "");
+            strcpy(students[studentsLength - 1].lastname, "");
+            strcpy(students[studentsLength - 1].birthday, "");
+            strcpy(students[studentsLength - 1].number, "");
+            studentsLength--;
             break;
         case '4':
             exit(0);

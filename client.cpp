@@ -9,8 +9,8 @@ struct Student
 {
     char name[35];
     char lastname[35];
-    char birthday[10];
-    char number[4];
+    char birthday[12];
+    char number[6];
 } students[100];
 int main()
 {
@@ -29,8 +29,8 @@ int main()
         // Выбор пункта меню и отправка его серверу puts("Choose:");
         // puts("\t1 - Select");
         puts("\t1 - Search");
-        puts("\t2 - Edit");
-        puts("\t3 - View");
+        puts("\t2 - Add");
+        puts("\t3 - Delete last student");
         puts("\t4 - Exit");
         scanf("%s", buf);
         buf[1] = '\0';
@@ -40,16 +40,16 @@ int main()
         {
         case '1':
         { // Выбрать
-            puts("Выбарите свойтво: \n1 - Name\n2 - Lastname\n3 - Birthday\n4 - Number");
+            puts("Выберите свойтво: \n1 - Name\n2 - Lastname\n3 - Birthday\n4 - Number");
             scanf("%s", buf);
             send(s, buf, sizeof(buf), 0);
             puts("Ваш запрос:\n");
             scanf("%s", buf);
             send(s, buf, sizeof(buf), 0);
-
             int foundedStudentsLength = 0;
             recv(s, &foundedStudentsLength, sizeof(int), 0);
-            recv(s, students, 100 * sizeof(struct Student), 0);
+
+            recv(s, students, sizeof(struct Student) * 100, 0);
             for (int i = 0; i < foundedStudentsLength; i++)
             {
                 puts(students[i].name);
@@ -57,82 +57,27 @@ int main()
                 puts(students[i].birthday);
                 puts(students[i].number);
             }
-
-            // puts("kol-vo months (1-12) :");
-            // scanf("%s", buf);
-            // send(s, buf, sizeof(buf), 0);
-            // puts("Symbol: ");
-            // scanf("%s", buf);
-            // send(s, buf, sizeof(buf), 0);
-            // printf("Sum of taxes: ");
-            // recv(s, buf, sizeof(buf), 0);
-            // for (t = 0; buf[t + 3]; t++)
-            //     printf("%c", buf[t]);
-            // printf(".");
-            // for (t1 = t; buf[t1]; t1++)
-            //     printf("%c", buf[t1]);
-            // printf("\n");
             break;
         }
-        case '2':             // Подредактировать puts("What number (1-5) to edit");
-            scanf("%s", buf); // Какой номер будем редактировать send(s,buf,sizeof(buf),0);
-            puts("What field (1-4) to edit");
+        case '2': // Подредактировать puts("What number (1-5) to edit");
+            puts("Введите свойство нового студента");
             puts("\t1 - Name");
-            puts("\t2 - Number");
-            puts("\t3 - Income");
-            puts("\t4 - Tax");
             scanf("%s", buf);
-            send(s, buf, sizeof(buf), 0);
-            p1 = buf[0];
-            buf[0] = '\0';
-            switch (p1)
-            { // Введите новые поля
-            case '1':
-                printf("Name: ");
-                fflush(stdin);
-                fflush(stdout);
-                scanf("%s", b);
-                strcat(buf, b);
-                strcat(buf, " ");
-                scanf("%s", b);
-                strcat(buf, b);
-                strcat(buf, " ");
-                scanf("%s", b);
-                strcat(buf, b);
-                strcat(buf, "\0");
-                send(s, buf, sizeof(buf), 0);
-                break;
-            case '2':
-                fflush(stdin);
-                fflush(stdout);
-                printf("Tab Number: ");
-                scanf("%s", buf);
-                send(s, buf, sizeof(buf), 0);
-                break;
-            case '3':
-                fflush(stdin);
-                fflush(stdout);
-                printf("Income per month: ");
-                scanf("%s", buf);
-                send(s, buf, sizeof(buf), 0);
-                break;
-            case '4':
-                fflush(stdin);
-                fflush(stdout);
-                printf("Tax rate (%) per month: ");
-                scanf("%s", buf);
-                send(s, buf, sizeof(buf), 0);
-            }
+            strcpy(students[99].name, buf);
+            printf("Новое имя: %s", students[99].name);
+            puts("\t2 - Lastname");
+            scanf("%s", buf);
+            strcpy(students[99].lastname, buf);
+            puts("\t3 - Birthday");
+            scanf("%s", buf);
+            strcpy(students[99].birthday, buf);
+            puts("\t4 - Number");
+            scanf("%s", buf);
+            strcpy(students[99].number, buf);
+            send(s, (Student *)&students[99], sizeof(struct Student), 0);
+
             break;
         case '3': // Просмотреть 5 записей recv(s,buf,sizeof(buf),0);printf("%s",buf);
-            recv(s, buf, sizeof(buf), 0);
-            printf("%s", buf);
-            recv(s, buf, sizeof(buf), 0);
-            printf("%s", buf);
-            recv(s, buf, sizeof(buf), 0);
-            printf("%s", buf);
-            recv(s, buf, sizeof(buf), 0);
-            printf("%s", buf);
             break;
         case '4': // Выход
             exit(0);
